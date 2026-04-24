@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Akreditasi PT — LLDIKTI Wilayah II 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  :root {
+    --navy: #0f2744;
+    --navy-mid: #1e3a5f;
+    --navy-light: #2e5c9e;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --green-deep: #1b5e20;
+    --green: #2e7d32;
+    --green-light: #4caf50;
+    --blue-deep: #0d47a1;
+    --orange: #e65100;
+    --red: #c62828;
+    --bg: #f0f4f9;
+    --surface: #ffffff;
+    --text: #1a2a40;
+    --muted: #6b7fa3;
+    --border: rgba(30,58,95,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HERO HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #0a1929 0%, #0f2744 40%, #1e3a5f 70%, #1a4a7a 100%);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(46,92,158,0.15) 0%, transparent 50%);
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    padding: 48px 60px 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .hero-emblem {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(201,168,76,0.35);
+  }
+  .hero-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+  }
+  .hero-text h1 span { color: var(--gold-light); font-style: italic; }
+  .hero-text p {
+    margin-top: 8px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  .hero-badge {
+    margin-left: auto;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .hero-badge .year {
+    font-size: 64px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.07);
+    line-height: 1;
+    letter-spacing: -4px;
+  }
+  .hero-badge .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  /* ── GOLD STRIP ── */
+  .gold-strip {
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+    height: 4px;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 36px 60px 60px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    margin-top: 40px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+  .section-label .bar {
+    width: 4px;
+    height: 22px;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-light) 100%);
+    border-radius: 2px;
+  }
+  .section-label h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--navy-mid);
+  }
+
+  /* ── KPI CARDS ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 20px 16px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .kpi-card.total::before { background: linear-gradient(90deg, var(--navy), var(--navy-light)); }
+  .kpi-card.unggul::before { background: linear-gradient(90deg, #0d47a1, #1976d2); }
+  .kpi-card.baik-sekali::before { background: linear-gradient(90deg, #1b5e20, #2e7d32); }
+  .kpi-card.baik::before { background: linear-gradient(90deg, #33691e, #558b2f); }
+  .kpi-card.b::before { background: linear-gradient(90deg, #1565c0, #1976d2); }
+  .kpi-card.terakreditasi::before { background: linear-gradient(90deg, #e65100, #f57c00); }
+  .kpi-card.tidak::before { background: linear-gradient(90deg, #c62828, #e53935); }
+
+  .kpi-icon { font-size: 20px; margin-bottom: 10px; display: block; }
+  .kpi-value {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-card.total .kpi-value { color: var(--navy-mid); }
+  .kpi-card.unggul .kpi-value { color: #0d47a1; }
+  .kpi-card.baik-sekali .kpi-value { color: #1b5e20; }
+  .kpi-card.baik .kpi-value { color: #33691e; }
+  .kpi-card.b .kpi-value { color: #1565c0; }
+  .kpi-card.terakreditasi .kpi-value { color: #e65100; }
+  .kpi-card.tidak .kpi-value { color: #c62828; }
+
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .kpi-pct {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 2px 8px;
+    background: var(--bg);
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* ── CHART GRID ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy-mid);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .chart-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .chart-canvas-wrap {
+    position: relative;
+  }
+
+  /* ── LEGEND ── */
+  .legend-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── TABLE ── */
+  .table-card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    margin-bottom: 20px;
+  }
+  .table-header-row {
+    padding: 20px 28px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    background: var(--navy-mid);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 12px 16px;
+    text-align: left;
+  }
+  th:not(:first-child) { text-align: center; }
+  td {
+    padding: 11px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td:not(:first-child) { text-align: center; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(240,244,249,0.6); }
+  tr:hover td { background: rgba(30,58,95,0.04); }
+  .province-name { font-weight: 700; color: var(--navy-mid); font-size: 13px; }
+  .total-cell { font-weight: 800; color: var(--navy-mid); font-size: 14px; }
+  .total-row td { 
+    background: var(--navy-mid) !important; 
+    color: #fff; 
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .badge-0 { background: transparent; color: var(--muted); }
+  .badge-unggul { background: #e8eaf6; color: #1a237e; }
+  .badge-bs { background: #e8f5e9; color: #1b5e20; }
+  .badge-b { background: #e3f2fd; color: #0d47a1; }
+  .badge-baik { background: #f1f8e9; color: #33691e; }
+  .badge-ter { background: #fff3e0; color: #e65100; }
+  .badge-tidak { background: #ffebee; color: #c62828; }
+
+  /* ── PROGRESS BARS ── */
+  .progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-label {
+    width: 120px;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text);
+  }
+  .progress-bar-wrap {
+    flex: 1;
+    background: var(--bg);
+    border-radius: 6px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease;
+  }
+  .progress-count {
+    width: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .progress-pct {
+    width: 42px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 28px 60px;
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .footer strong { color: var(--gold); }
+
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-grid-3 { grid-template-columns: 1fr 1fr; }
+    .main { padding: 28px 28px 48px; }
+    .hero-inner { padding: 32px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-emblem">🎓</div>
+    <div class="hero-text">
+      <h1>Dashboard Akreditasi <span>Perguruan Tinggi</span></h1>
+      <p>LLDIKTI Wilayah II &nbsp;·&nbsp; Bangka Belitung · Bengkulu · Lampung · Sumatera Selatan</p>
+    </div>
+    <div class="hero-badge">
+      <div class="year">2026</div>
+      <div class="label">Data Tahun 2026</div>
+    </div>
+  </div>
+  <div class="gold-strip"></div>
+</div>
+
+<div class="main">
+
+  <!-- SECTION: RINGKASAN -->
+  <div class="section-label">
+    <div class="bar"></div>
+    <h2>Ringkasan Utama</h2>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card total">
+      <span class="kpi-icon">🏛️</span>
+      <div class="kpi-value">157</div>
+      <div class="kpi-label">Total PT</div>
+      <span class="kpi-pct">LLDIKTI II</span>
+    </div>
+    <div class="kpi-card unggul">
+      <span class="kpi-icon">🥇</span>
+      <div class="kpi-value">4</div>
+      <div class="kpi-label">Unggul</div>
+      <span class="kpi-pct">2.5%</span>
+    </div>
+    <div class="kpi-card baik-sekali">
+      <span class="kpi-icon">⭐</span>
+      <div class="kpi-value">26</div>
+      <div class="kpi-label">Baik Sekali</div>
+      <span class="kpi-pct">16.6%</span>
+    </div>
+    <div class="kpi-card b">
+      <span class="kpi-icon">📘</span>
+      <div class="kpi-value">12</div>
+      <div class="kpi-label">Peringkat B</div>
+      <span class="kpi-pct">7.6%</span>
+    </div>
+    <div class="kpi-card baik">
+      <span class="kpi-icon">✅</span>
+      <div class="kpi-value">76</div>
+      <div class="kpi-label">Baik</div>
+      <span class="kpi-pct">48.4%</span>
+    </div>
+    <div class="kpi-card terakreditasi">
+      <span class="kpi-icon">📋</span>
+      <div class="kpi-value">19</div>
+      <div class="kpi-label">Terakreditasi</div>
+      <span class="kpi-pct">12.1%</span>
+    </div>
+    <div class="kpi-card tidak">
+      <span class="kpi-icon">⚠️</span>
+      <div class="kpi-value">20</div>
+      <div class="kpi-label">Tdk Terakreditasi</div>
+      <span class="kpi-pct">12.7%</span>
+    </div>
+  </div>
+
+  <!-- SECTION: GRAFIK UTAMA -->
+  <div class="section-label">
+    <div class="bar"></div>
+    <h2>Grafik Distribusi Akreditasi</h2>
+  </div>
+
+  <div class="chart-grid">
+    <!-- Bar Chart: Peringkat -->
+    <div class="chart-card">
+      <div class="chart-title">Distribusi per Peringkat Akreditasi</div>
+      <div class="chart-subtitle">Jumlah perguruan tinggi berdasarkan peringkat akreditasi BAN-PT</div>
+      <div class="chart-canvas-wrap" style="height:280px">
+        <canvas id="barPeringkat"></canvas>
+      </div>
+    </div>
+    <!-- Donut: Peringkat -->
+    <div class="chart-card">
+      <div class="chart-title">Proporsi Akreditasi</div>
+      <div class="chart-subtitle">Persentase berdasarkan peringkat akreditasi</div>
+      <div class="chart-canvas-wrap" style="height:220px">
+        <canvas id="donutPeringkat"></canvas>
+      </div>
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-dot" style="background:#0d47a1"></div>Unggul (4)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div>Baik Sekali (26)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1565c0"></div>B (12)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#558b2f"></div>Baik (76)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div>Terakreditasi (19)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c62828"></div>Tdk Terakreditasi (20)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: PER PROVINSI -->
+  <div class="section-label">
+    <div class="bar"></div>
+    <h2>Distribusi per Provinsi</h2>
+  </div>
+
+  <div class="chart-grid">
+    <!-- Stacked Bar: Provinsi -->
+    <div class="chart-card">
+      <div class="chart-title">Akreditasi per Provinsi (Stacked)</div>
+      <div class="chart-subtitle">Komposisi peringkat akreditasi di setiap provinsi</div>
+      <div class="chart-canvas-wrap" style="height:280px">
+        <canvas id="stackedProvinsi"></canvas>
+      </div>
+    </div>
+
+    <!-- Progress bars -->
+    <div class="chart-card">
+      <div class="chart-title">Distribusi Jumlah PT per Provinsi</div>
+      <div class="chart-subtitle">Total perguruan tinggi yang terdaftar di LLDIKTI Wilayah II</div>
+      <div style="height: 20px"></div>
+      <div class="progress-section">
+        <div class="progress-row">
+          <span class="progress-label">Sumatera Selatan</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:48.4%; background: linear-gradient(90deg, #0f2744, #2e5c9e)"></div>
+          </div>
+          <span class="progress-count" style="color:#0f2744">76</span>
+          <span class="progress-pct">48.4%</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">Lampung</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:36.3%; background: linear-gradient(90deg, #1b5e20, #4caf50)"></div>
+          </div>
+          <span class="progress-count" style="color:#1b5e20">57</span>
+          <span class="progress-pct">36.3%</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">Bengkulu</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:8.9%; background: linear-gradient(90deg, #e65100, #ff9800)"></div>
+          </div>
+          <span class="progress-count" style="color:#e65100">14</span>
+          <span class="progress-pct">8.9%</span>
+        </div>
+        <div class="progress-row">
+          <span class="progress-label">Bangka Belitung</span>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:6.4%; background: linear-gradient(90deg, #1565c0, #42a5f5)"></div>
+          </div>
+          <span class="progress-count" style="color:#1565c0">10</span>
+          <span class="progress-pct">6.4%</span>
+        </div>
+      </div>
+
+      <div style="height: 28px"></div>
+      <div class="chart-title">Pie Distribusi Provinsi</div>
+      <div style="height: 12px"></div>
+      <div class="chart-canvas-wrap" style="height:130px">
+        <canvas id="pieProvinsi"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- REKAPITULASI TABLE -->
+  <div class="section-label">
+    <div class="bar"></div>
+    <h2>Rekapitulasi per Provinsi dan Peringkat</h2>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header-row">
+      <div>
+        <div style="font-weight:700;font-size:14px;color:var(--navy-mid)">Tabel Rekap Akreditasi</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Jumlah PT per peringkat akreditasi berdasarkan wilayah provinsi</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">Total: <strong style="color:var(--navy-mid)">157 Perguruan Tinggi</strong></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Provinsi</th>
+          <th title="Unggul">🥇 Unggul</th>
+          <th title="Baik Sekali">⭐ Baik Sekali</th>
+          <th title="B">📘 B</th>
+          <th title="Baik">✅ Baik</th>
+          <th title="Terakreditasi">📋 Terakreditasi</th>
+          <th title="Tidak Terakreditasi">⚠️ Tdk Terakreditasi</th>
+          <th>Total PT</th>
+          <th>Proporsi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="province-name">Bangka Belitung</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-bs">3</span></td>
+          <td><span class="badge badge-b">1</span></td>
+          <td><span class="badge badge-baik">6</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td class="total-cell">10</td>
+          <td style="font-size:11px;color:var(--muted)">6.4%</td>
+        </tr>
+        <tr>
+          <td class="province-name">Bengkulu</td>
+          <td><span class="badge badge-unggul">1</span></td>
+          <td><span class="badge badge-bs">2</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-baik">9</span></td>
+          <td><span class="badge badge-ter">1</span></td>
+          <td><span class="badge badge-tidak">1</span></td>
+          <td class="total-cell">14</td>
+          <td style="font-size:11px;color:var(--muted)">8.9%</td>
+        </tr>
+        <tr>
+          <td class="province-name">Lampung</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-bs">8</span></td>
+          <td><span class="badge badge-b">6</span></td>
+          <td><span class="badge badge-baik">34</span></td>
+          <td><span class="badge badge-ter">3</span></td>
+          <td><span class="badge badge-tidak">6</span></td>
+          <td class="total-cell">57</td>
+          <td style="font-size:11px;color:var(--muted)">36.3%</td>
+        </tr>
+        <tr>
+          <td class="province-name">Sumatera Selatan</td>
+          <td><span class="badge badge-unggul">3</span></td>
+          <td><span class="badge badge-bs">13</span></td>
+          <td><span class="badge badge-b">5</span></td>
+          <td><span class="badge badge-baik">27</span></td>
+          <td><span class="badge badge-ter">15</span></td>
+          <td><span class="badge badge-tidak">13</span></td>
+          <td class="total-cell">76</td>
+          <td style="font-size:11px;color:var(--muted)">48.4%</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td style="font-size:13px;letter-spacing:0.5px">TOTAL</td>
+          <td>4</td>
+          <td>26</td>
+          <td>12</td>
+          <td>76</td>
+          <td>19</td>
+          <td>20</td>
+          <td style="font-size:15px">157</td>
+          <td>100%</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- BENTUK PT -->
+  <div class="section-label">
+    <div class="bar"></div>
+    <h2>Distribusi per Bentuk Perguruan Tinggi</h2>
+  </div>
+
+  <div class="chart-grid-3">
+    <div class="chart-card" style="grid-column: span 2">
+      <div class="chart-title">Akreditasi per Bentuk PT</div>
+      <div class="chart-subtitle">Komposisi peringkat akreditasi berdasarkan bentuk perguruan tinggi</div>
+      <div class="chart-canvas-wrap" style="height:280px">
+        <canvas id="stackedBentuk"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Jumlah per Bentuk PT</div>
+      <div class="chart-subtitle">Total PT berdasarkan bentuk kelembagaan</div>
+      <div class="chart-canvas-wrap" style="height:280px">
+        <canvas id="doughnutBentuk"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE BENTUK PT -->
+  <div class="table-card">
+    <div class="table-header-row">
+      <div>
+        <div style="font-weight:700;font-size:14px;color:var(--navy-mid)">Rekap per Bentuk Perguruan Tinggi</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Jumlah PT dan komposisi akreditasi berdasarkan bentuk institusi</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Bentuk PT</th>
+          <th>🥇 Unggul</th>
+          <th>⭐ Baik Sekali</th>
+          <th>📘 B</th>
+          <th>✅ Baik</th>
+          <th>📋 Terakreditasi</th>
+          <th>⚠️ Tdk Terakreditasi</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="province-name">Universitas</td>
+          <td><span class="badge badge-unggul">3</span></td>
+          <td><span class="badge badge-bs">16</span></td>
+          <td><span class="badge badge-b">10</span></td>
+          <td><span class="badge badge-baik">12</span></td>
+          <td><span class="badge badge-ter">9</span></td>
+          <td><span class="badge badge-tidak">3</span></td>
+          <td class="total-cell">53</td>
+        </tr>
+        <tr>
+          <td class="province-name">Sekolah Tinggi</td>
+          <td><span class="badge badge-unggul">1</span></td>
+          <td><span class="badge badge-bs">7</span></td>
+          <td><span class="badge badge-b">1</span></td>
+          <td><span class="badge badge-baik">32</span></td>
+          <td><span class="badge badge-ter">8</span></td>
+          <td><span class="badge badge-tidak">7</span></td>
+          <td class="total-cell">56</td>
+        </tr>
+        <tr>
+          <td class="province-name">Institut</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-bs">2</span></td>
+          <td><span class="badge badge-b">1</span></td>
+          <td><span class="badge badge-baik">13</span></td>
+          <td><span class="badge badge-ter">1</span></td>
+          <td><span class="badge badge-tidak">1</span></td>
+          <td class="total-cell">18</td>
+        </tr>
+        <tr>
+          <td class="province-name">Akademi</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-baik">12</span></td>
+          <td><span class="badge badge-ter">1</span></td>
+          <td><span class="badge badge-tidak">7</span></td>
+          <td class="total-cell">20</td>
+        </tr>
+        <tr>
+          <td class="province-name">Politeknik</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-bs">1</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-baik">5</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-tidak">1</span></td>
+          <td class="total-cell">7</td>
+        </tr>
+        <tr>
+          <td class="province-name">Akademi Komunitas</td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-baik">2</span></td>
+          <td><span class="badge badge-0">—</span></td>
+          <td><span class="badge badge-tidak">1</span></td>
+          <td class="total-cell">3</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td>TOTAL</td>
+          <td>4</td><td>26</td><td>12</td><td>76</td><td>19</td><td>20</td>
+          <td>157</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">
+  Dashboard Akreditasi Perguruan Tinggi &nbsp;·&nbsp; <strong>LLDIKTI Wilayah II</strong> &nbsp;·&nbsp; Tahun 2026 &nbsp;·&nbsp;
+  Sumber data: Daftar PTS LLDIKTI Wilayah II
+</div>
+
+<script>
+const COLORS = {
+  unggul:    '#0d47a1',
+  baikSekali:'#2e7d32',
+  b:         '#1565c0',
+  baik:      '#558b2f',
+  terakreditasi: '#e65100',
+  tidak:     '#c62828',
+};
+
+const PERINGKAT_LABELS = ['Unggul','Baik Sekali','B','Baik','Terakreditasi','Tdk Terakreditasi'];
+const PERINGKAT_COLORS = [COLORS.unggul, COLORS.baikSekali, COLORS.b, COLORS.baik, COLORS.terakreditasi, COLORS.tidak];
+const PERINGKAT_DATA   = [4, 26, 12, 76, 19, 20];
+
+// ── Bar Peringkat
+new Chart(document.getElementById('barPeringkat'), {
+  type: 'bar',
+  data: {
+    labels: PERINGKAT_LABELS,
+    datasets: [{
+      label: 'Jumlah PT',
+      data: PERINGKAT_DATA,
+      backgroundColor: PERINGKAT_COLORS.map(c => c + 'cc'),
+      borderColor: PERINGKAT_COLORS,
+      borderWidth: 2,
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} Perguruan Tinggi` } }
+    },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Donut Peringkat
+new Chart(document.getElementById('donutPeringkat'), {
+  type: 'doughnut',
+  data: {
+    labels: PERINGKAT_LABELS,
+    datasets: [{
+      data: PERINGKAT_DATA,
+      backgroundColor: PERINGKAT_COLORS.map(c => c + 'dd'),
+      borderColor: '#fff',
+      borderWidth: 3,
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} PT (${(ctx.parsed/157*100).toFixed(1)}%)` } }
+    }
+  }
+});
+
+// ── Stacked Bar Provinsi
+const provinsiLabels = ['Bangka Belitung','Bengkulu','Lampung','Sumatera Selatan'];
+const provinsiData = {
+  'Unggul':           [0,1,0,3],
+  'Baik Sekali':      [3,2,8,13],
+  'B':                [1,0,6,5],
+  'Baik':             [6,9,34,27],
+  'Terakreditasi':    [0,1,3,15],
+  'Tdk Terakreditasi':[0,1,6,13],
+};
+
+new Chart(document.getElementById('stackedProvinsi'), {
+  type: 'bar',
+  data: {
+    labels: provinsiLabels,
+    datasets: Object.entries(provinsiData).map(([label, data], i) => ({
+      label, data,
+      backgroundColor: PERINGKAT_COLORS[i] + 'cc',
+      borderColor: PERINGKAT_COLORS[i],
+      borderWidth: 1,
+      borderRadius: i===5 ? 6 : 0,
+      borderSkipped: 'bottom',
+    }))
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 10 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+
+// ── Pie Provinsi
+new Chart(document.getElementById('pieProvinsi'), {
+  type: 'pie',
+  data: {
+    labels: provinsiLabels,
+    datasets: [{
+      data: [10, 14, 57, 76],
+      backgroundColor: ['#1565c0cc','#e65100cc','#2e7d32cc','#0f2744cc'],
+      borderColor: '#fff',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 10, padding: 8 } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} PT` } }
+    }
+  }
+});
+
+// ── Stacked Bentuk PT
+const bentukLabels = ['Universitas','Sekolah Tinggi','Institut','Akademi','Politeknik','Akademi Komunitas'];
+const bentukData = {
+  'Unggul':           [3,1,0,0,0,0],
+  'Baik Sekali':      [16,7,2,0,1,0],
+  'B':                [10,1,1,0,0,0],
+  'Baik':             [12,32,13,12,5,2],
+  'Terakreditasi':    [9,8,1,1,0,0],
+  'Tdk Terakreditasi':[3,7,1,7,1,1],
+};
+
+new Chart(document.getElementById('stackedBentuk'), {
+  type: 'bar',
+  data: {
+    labels: bentukLabels,
+    datasets: Object.entries(bentukData).map(([label, data], i) => ({
+      label, data,
+      backgroundColor: PERINGKAT_COLORS[i] + 'cc',
+      borderColor: PERINGKAT_COLORS[i],
+      borderWidth: 1,
+      borderRadius: i===5 ? 5 : 0,
+      borderSkipped: 'bottom',
+    }))
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 12, padding: 10 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+
+// ── Doughnut Bentuk PT
+new Chart(document.getElementById('doughnutBentuk'), {
+  type: 'doughnut',
+  data: {
+    labels: bentukLabels,
+    datasets: [{
+      data: [53, 56, 18, 20, 7, 3],
+      backgroundColor: ['#0f2744cc','#1e3a5fcc','#2e5c9ecc','#4a80c4cc','#6a9fd8cc','#8ab8e8cc'],
+      borderColor: '#fff',
+      borderWidth: 3,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '50%',
+    plugins: {
+      legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 10, padding: 8 } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} PT` } }
+    }
+  }
+});
+</script>
+</body>
+</html>
